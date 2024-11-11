@@ -1,48 +1,69 @@
 #include "matrix.hpp"
 
+#include <iostream>
+#include <vector>
 #include <stdexcept>
+using namespace std;
 
-Matrix::Matrix(int numRows, int numCols)
-{
-    // your implementation here
-}
+class Matrix {
+private:
+	vector<vector<int>>data;
+	int num_rows;
+	int num_cols;
+public:
+	Matrix() : num_rows(0), num_cols(0) {
 
-void Matrix::Reset(int numRows, int numCols)
-{
-    // your implementation here
-}
+	}
+	Matrix(int rows, int cols) : num_rows(rows), num_cols(cols) {
+		if (rows < 0 || cols < 0) {
+			throw out_of_range("Out of range");
+		}
+		data.resize(rows, vector<int>(cols, 0));
+	}
+	Matrix(const Matrix& other) : num_rows(other.num_rows), num_cols(other.num_cols), data(other.data) {
 
-int& Matrix::At(int row, int col)
-{
-    // your implementation here
-}
-
-const int& Matrix::At(int row, int col) const
-{
-    // your implementation here
-}
-
-int Matrix::GetRows() const
-{
-    // your implementation here
-}
-
-int Matrix::GetCols() const
-{
-    // your implementation here
-}
-
-bool Matrix::operator==(const Matrix& m2)
-{
-    // your implementation here
-}
-
-bool Matrix::operator!=(const Matrix& m2)
-{
-    // your implementation here
-}
-
-Matrix Matrix::operator+(const Matrix& m2)
-{
-    // your implementation here
-}
+	}
+	Matrix(Matrix&& other) noexcept : num_rows(other.num_rows), num_cols(other.num_cols), data(move(other.data)) {
+		other.num_rows = 0;
+		other.num_cols = 0;
+	}
+	void Reset(int rows, int cols) {
+		if (rows < 0 || cols < 0) {
+			throw out_of_range("Out of range");
+		}
+		num_rows = rows;
+		num_cols = cols;
+		data.assign(rows, vector<int>(cols, 0));
+	}
+	int At(int row, int col) const {
+		if (row < 0 || row >= num_rows || col < 0 || col >= num_cols) {
+			throw out_of_range("Index out of bounds");
+		}
+		return data[row][col];
+	}
+	int& At(int row, int col) {
+		if (row < 0 || row >= num_rows || col < 0 || col >= num_cols) {
+			throw out_of_range("Index out of bounds");
+		}
+		return data[row][col];
+	}
+	int GetRows() const {
+		return num_rows;
+	}
+	int GetCols() const {
+		return num_cols;
+	}
+	friend istream& operator>>(istream& is, Matrix& matrix) {
+		int rows, cols;
+		is >> rows >> cols;
+		matrix.Reset(rows, cols);
+		for (int i = 0; i < rows; ++i) {
+			for (int j = 0; j < cols; ++j) {
+				is >> matrix.At(i, j);
+			}
+		}
+		return is;
+	}
+	friend ostream& operator<<(ostream& os, const Matrix& matrix) {
+		os << matrix.num_rows << " " << matrix.num_cols << "\n";
+		for (int i = 0; i < matrix.num_rows; ++i) 
